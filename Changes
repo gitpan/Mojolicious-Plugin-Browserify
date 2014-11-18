@@ -1,0 +1,8 @@
+Changelog for Mojolicious::Plugin::Browserify
+
+0.01     Tue Nov 18 20:30:28 2014
+       * Able to install and run browserify from ./node_modules
+       * Able to add "reactify" as transformer
+       * Able to calculate checksum from all required modules
+       * Able to cache modules required from ./node_modules
+

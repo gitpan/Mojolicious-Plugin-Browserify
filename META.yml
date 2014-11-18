@@ -1,0 +1,27 @@
+---
+abstract: 'An Mojolicious plugin for assetpack+browserify'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Browserify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JavaScript::Minifier::XS: 0.09
+  Mojolicious::Plugin::AssetPack: 0.31
+resources:
+  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-browserify/issues
+  homepage: https://github.com/jhthorsen/mojolicious-plugin-browserify
+  repository: https://github.com/jhthorsen/mojolicious-plugin-browserify.git
+version: 0.01
