@@ -36,7 +36,6 @@ use Mojo::Util;
 use Cwd         ();
 use File::Which ();
 use File::Spec;
-use JavaScript::Minifier::XS ();
 use constant DEBUG => $ENV{MOJO_ASSETPACK_DEBUG} || 0;
 use constant CACHE_DIR => '.browserify';
 
@@ -77,17 +76,7 @@ current project directory.
 has browserify_args => sub { [] };
 has environment     => 'development';
 has extensions      => sub { ['js'] };
-has executable      => sub {
-  my $self  = shift;
-  my $paths = $self->_node_module_path;
-
-  for my $p (@$paths) {
-    my $local = Cwd::abs_path(File::Spec->catfile($p, qw( .bin browserify )));
-    return $local if $local and -e $local;
-  }
-
-  return File::Which::which('browserify') || 'browserify';
-};
+has executable => sub { shift->_executable('browserify') || 'browserify' };
 
 =head1 METHODS
 
@@ -154,11 +143,22 @@ sub process {
   }
   elsif (length $$text) {
     $$text = join "\n", (map { Mojo::Util::slurp($_) } @modules), $$text;
-    $$text = JavaScript::Minifier::XS::minify($$text) if $assetpack->minify;
-    $$text = "alert('Failed to minify $path')\n" unless defined $$text;
+    $self->_minify($text, $path) if $assetpack->minify;
   }
 
   return $self;
+}
+
+sub _executable {
+  my ($self, $name) = @_;
+  my $paths = $self->{node_module_path} || $self->_node_module_path;
+
+  for my $p (@$paths) {
+    my $local = Cwd::abs_path(File::Spec->catfile($p, '.bin', $name));
+    return $local if $local and -e $local;
+  }
+
+  return File::Which::which($name);
 }
 
 sub _find_node_modules {
@@ -202,6 +202,25 @@ sub _follow_system_node_module {
   }
 
   die "Could not find JavaScript module '$module' in @{$self->{node_module_path}}";
+}
+
+sub _minify {
+  my ($self, $text, $path) = @_;
+  my $uglifyjs = $self->_executable('uglifyjs');
+  my $err      = '';
+
+  if ($uglifyjs) {
+    $self->_run([$uglifyjs, qw( -m -c  )], $text, $text, \$err);
+  }
+  else {
+    require JavaScript::Minifier::XS;
+    $$text = JavaScript::Minifier::XS::minify($$text);
+    $err = 'JavaScript::Minifier::XS failed' unless $$text;
+  }
+
+  if (length $err) {
+    $self->_make_js_error($err, $text);
+  }
 }
 
 sub _node_module_path {

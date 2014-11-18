@@ -3,7 +3,7 @@ NAME
     assetpack+browserify
 
 VERSION
-    0.01
+    0.02
 
 DESCRIPTION
     Mojolicious::Plugin::Browserify is a plugin that will register
@@ -48,17 +48,32 @@ SYNOPSIS
       $ mojo browserify install reactify
 
 DEPENDENCIES
-    This module require browserify <http://browserify.org/> to be installed.
-    The node based application can either be installed system wide or
-    locally to your project. To install it locally, you can use the
-    browserify Mojolicious command:
+    *   browserify
 
-      # same as "npm install browserify"
-      $ mojo browserify install
+        This module require browserify <http://browserify.org/> to be
+        installed. The node based application can either be installed system
+        wide or locally to your project. To install it locally, you can use
+        the browserify Mojolicious command:
 
-    It is also possible to check installed versions using this command:
+          # same as "npm install browserify"
+          $ mojo browserify install
 
-      $ mojo browserify version
+        It is also possible to check installed versions using this command:
+
+          $ mojo browserify version
+
+    *   uglifyjs
+
+        uglifyjs <https://github.com/mishoo/UglifyJS2> is a really good
+        minifier. The test "react.t" used to create a bundle that took 324K
+        with JavaScript::Minifier::XS. With "uglifyjs" the same code takes
+        "156K".
+
+        What is the drawback? It takes a lot longer to run "uglifyjs", but
+        it's worth it, since it will only be called in production mode. Get
+        it with this command:
+
+          $ mojo browserify install uglify-js
 
 METHODS
   register

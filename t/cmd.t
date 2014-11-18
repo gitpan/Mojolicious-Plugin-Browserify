@@ -23,7 +23,7 @@ $cmd->version;
 like "@print", qr{REQUIRED}, 'REQUIRED';
 like "@print", qr{OPTIONAL}, 'OPTIONAL';
 is $print[3], Mojolicious::Plugin::Browserify->VERSION, 'VERSION';
-is int(grep { $_ eq 'Not installed' } @print), 3, 'Not installed';
-is int(grep { $_ =~ /  %-40s.*\n/ } @print), 4, 'sprintf';
+is int(grep { $_ eq 'Not installed' } @print), 4, 'Not installed';
+is int(grep { $_ =~ /  %-40s.*\n/ } @print), 5, 'sprintf';
 
 done_testing;

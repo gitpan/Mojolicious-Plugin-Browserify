@@ -1,5 +1,8 @@
 Changelog for Mojolicious::Plugin::Browserify
 
+0.02     Tue Nov 18 22:36:48 2014
+       * Add support for uglifyjs
+
 0.01     Tue Nov 18 20:30:28 2014
        * Able to install and run browserify from ./node_modules
        * Able to add "reactify" as transformer

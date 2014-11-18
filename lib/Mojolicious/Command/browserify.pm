@@ -81,7 +81,7 @@ sub version {
   $self->_printf("  %-40s %s\n", 'Mojolicious::Plugin::Browserify', Mojolicious::Plugin::Browserify->VERSION);
   $self->_npm_version($_) for qw( browserify );
   $self->_printf("\nOPTIONAL\n");
-  $self->_npm_version($_) for qw( react reactify );
+  $self->_npm_version($_) for qw( react reactify uglifyjs );
   $self->_printf("\n");
 }
 

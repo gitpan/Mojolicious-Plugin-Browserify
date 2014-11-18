@@ -20,8 +20,8 @@ t/public/js/react-progressbar.js
 t/public/js/react-simple.js
 t/public/js/robot.js
 t/public/packed/.browserify/react-development.js
+t/public/packed/app-complex-1b2f53907cc1e93b032868d2015b0418.js
 t/public/packed/foo.html
-t/public/packed/react-complex-d61656948cd6c1db8fcfd7ae456b2fb6.js
 t/react.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
