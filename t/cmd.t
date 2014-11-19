@@ -16,7 +16,7 @@ no warnings 'redefine';
 
 @print = ();
 eval { $cmd->install('adskjnadsksajndlksandnsakdnaslkdnad') };
-like $@, qr{failed:}, 'could not install adskjnadsksajndlksandnsakdnaslkdnad';
+like $@, qr{(failed:|Could not exec)}, 'could not install adskjnadsksajndlksandnsakdnaslkdnad';
 
 @print = ();
 $cmd->version;

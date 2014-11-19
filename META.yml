@@ -24,4 +24,4 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-browserify/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-browserify
   repository: https://github.com/jhthorsen/mojolicious-plugin-browserify.git
-version: 0.02
+version: 0.03

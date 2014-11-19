@@ -104,8 +104,10 @@ sub _npm {
   close $CHILD_READ;
   close STDERR;
   open STDOUT, '>&', fileno($CHILD_WRITE);
-  exec $NPM => @cmd;
-  die "Could not exec $NPM: $! (Is npm installed?)\n";
+  { exec $NPM => @cmd }
+  my $err = $!;
+  print "Could not exec $NPM: $err (Is npm installed?)\n";
+  exit $err;
 }
 
 sub _npm_version {

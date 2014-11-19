@@ -1,5 +1,8 @@
 Changelog for Mojolicious::Plugin::Browserify
 
+0.03     Wed Nov 19 15:17:52 2014
+       * Fix t/cmd.t when "npm" is not available
+
 0.02     Tue Nov 18 22:36:48 2014
        * Add support for uglifyjs
 
