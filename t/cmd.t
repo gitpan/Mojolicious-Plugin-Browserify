@@ -6,6 +6,8 @@ use File::Spec;
 use Test::More;
 
 chdir File::Spec->tmpdir or plan skip_all => "Could not chdir to temp: $!";
+plan skip_all => 'Hangs on Windows' if $^O =~ /win/i;
+plan skip_all => 'no internet'      if $ENV{NO_INTERNET};
 my $cmd = Mojolicious::Command::browserify->new;
 
 isa_ok($cmd, 'Mojolicious::Command');

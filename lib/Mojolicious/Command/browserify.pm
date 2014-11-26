@@ -11,14 +11,34 @@ C<browserify> dependencies and installation.
 
 =head1 SYNOPSIS
 
-  $ mojo browserify install
-  $ mojo browserify version
+  # Bundle an asset from command line
+  \$ mojo browserify bundle input.js
+
+  # Pass on "-t reactify" to browserify
+  \$ mojo browserify bundle -t reactify input.js
+
+  # Watch input files and write output to out.js
+  \$ mojo browserify bundle -t reactify input.js -w -o out.js
+
+  # Make a minified bundle
+  \$ MOJO_MODE=production mojo browserify bundle -t reactify input.js
+
+  # Install dependencies
+  \$ mojo browserify install browserify
+  \$ mojo browserify install reactify
+
+  # Check installed versions
+  \$ mojo browserify version
 
 =cut
 
 use Mojo::Base 'Mojolicious::Command';
+use Cwd 'abs_path';
+use File::Basename 'dirname';
 
 my $NPM = $ENV{NODE_NPM_BIN} || 'npm';
+
+$ENV{MOJO_LOG_LEVEL} ||= 'info';
 
 =head1 ATTRIBUTES
 
@@ -33,9 +53,63 @@ Usage information for command, used for the help screen.
 =cut
 
 has description => "Manage browserify.";
-has usage       => "mojo browserify {install|version}\n";
+has usage       => <<"HERE";
+# Bundle an asset from command line
+\$ mojo browserify bundle input.js
+
+# Pass on "-t reactify" to browserify
+\$ mojo browserify bundle -t reactify input.js
+
+# Watch input files and write output to out.js
+\$ mojo browserify bundle -t reactify input.js -w -o out.js
+
+# Make a minified bundle
+\$ MOJO_MODE=production mojo browserify bundle -t reactify input.js
+
+# Install dependencies
+\$ mojo browserify install browserify
+\$ mojo browserify install reactify
+
+# Check installed versions
+\$ mojo browserify version
+
+HERE
 
 =head1 METHODS
+
+=head2 bundle
+
+This method will bundle a JavaScript file from the command line.
+
+=cut
+
+sub bundle {
+  my $self = shift->_parse_bundle_args(@_);
+
+  require Mojolicious::Plugin::AssetPack;
+  require Mojolicious::Plugin::Browserify::Processor;
+  require Mojolicious::Static;
+
+  my $assetpack = Mojolicious::Plugin::AssetPack->new;
+  my $processor = Mojolicious::Plugin::Browserify::Processor->new;
+
+  $assetpack->out_dir(Cwd::getcwd)->{static} = Mojolicious::Static->new;
+  $assetpack->minify(1) if $processor->environment eq 'production';
+  $processor->browserify_args($self->{browserify_args} || []);
+  chdir dirname $self->{in} or die "Could not chdir to $self->{in}: $!\n";
+
+  do {
+    my $javascript = Mojo::Util::slurp($self->{in});
+    $processor->process($assetpack, \$javascript, $self->{in});
+    if ($self->{out}) {
+      Mojo::Util::spurt($javascript, $self->{out});
+      $self->app->log->info("Wrote $self->{out}");
+    }
+    else {
+      $self->_printf("%s\n", $javascript);
+    }
+  } while $self->{watch} and $self->_watch($processor);
+}
 
 =head2 install
 
@@ -63,7 +137,7 @@ sub run {
   my $action = shift || '';
 
   exec perldoc => __FILE__ if $action eq 'help';
-  return print $self->usage unless $action =~ /^(install|version)$/;
+  return print $self->usage unless $action =~ /^(bundle|install|version)$/;
   return $self->$action(@_);
 }
 
@@ -120,7 +194,40 @@ sub _npm_version {
   $self->_printf($format, $module, $installed || 'Not installed', $latest || 'Unknown');
 }
 
+sub _parse_bundle_args {
+  my ($self, @args) = @_;
+
+  while (@args) {
+    my $arg = shift @args // next;
+    if ($arg =~ /^--?w/) { $self->{watch} = 1;                     next }
+    if ($arg =~ /^--?o/) { $self->{out}   = abs_path(shift @args); next }
+    if (-r $arg)         { $self->{in}    = abs_path($arg);        next }
+    push @{$self->{browserify_args}}, $arg;
+  }
+
+  die "Usage: mojo browserify bundle <input.js>\n" unless $self->{in};
+  die "-o <file> is required in watch mode (-w).\n" if $self->{watch} and !$self->{out};
+  $self;
+}
+
 sub _printf { shift; printf shift, @_; }
+
+sub _watch {
+  my ($self, $processor) = @_;
+  my @watch = ($self->{in}, values %{$processor->{node_modules}});
+  my $cache = {};
+
+  $self->app->log->debug("Watching @watch");
+
+  while (1) {
+    for my $file (@watch) {
+      my $mtime = (stat $file)[9] or next;
+      $cache->{$file} ||= $mtime;
+      return 1 unless $cache->{$file} == $mtime;
+    }
+    sleep 1;
+  }
+}
 
 =head1 COPYRIGHT AND LICENSE
 

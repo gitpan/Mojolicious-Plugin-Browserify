@@ -33,9 +33,11 @@ See also L<Mojolicious::Plugin::Browserify> for a simpler API.
 
 use Mojo::Base 'Mojolicious::Plugin::AssetPack::Preprocessor';
 use Mojo::Util;
-use Cwd         ();
-use File::Which ();
+use Cwd ();
+use File::Basename 'dirname';
+use File::Path 'make_path';
 use File::Spec;
+use File::Which ();
 use constant DEBUG => $ENV{MOJO_ASSETPACK_DEBUG} || 0;
 use constant CACHE_DIR => '.browserify';
 
@@ -74,7 +76,7 @@ current project directory.
 =cut
 
 has browserify_args => sub { [] };
-has environment     => 'development';
+has environment     => sub { $ENV{MOJO_MODE} || $ENV{NODE_ENV} || 'development' };
 has extensions      => sub { ['js'] };
 has executable => sub { shift->_executable('browserify') || 'browserify' };
 
@@ -127,10 +129,12 @@ sub process {
   mkdir $cache_dir or die "mkdir $cache_dir: $!" unless -d $cache_dir;
   $self->_node_module_path;
   $self->_find_node_modules($text, $path, $map);
+  $self->{node_modules} = $map;
 
   for my $module (grep {/^\w/} keys %$map) {
     push @modules, $self->_outfile($assetpack, "$module-$environment.js");
     next if -e $modules[-1] and (stat _)[9] >= (stat $map->{$module})[9];
+    make_path(dirname $modules[-1]);
     $self->_run([$self->executable, @extra, -r => $module, -o => $modules[-1]], undef, undef, \$err);
   }
 

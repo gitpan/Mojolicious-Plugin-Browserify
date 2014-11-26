@@ -1,5 +1,9 @@
 Changelog for Mojolicious::Plugin::Browserify
 
+0.04     Wed Nov 26 09:07:16 2014
+       * Add "mojo browserify bundle" command
+       * Will skip t/cmd.t on $^O =~ /win/
+
 0.03     Wed Nov 19 15:17:52 2014
        * Fix t/cmd.t when "npm" is not available
 
