@@ -15,13 +15,14 @@ t/cmd.t
 t/processor-defaults.t
 t/processor.t
 t/public/js/boop.js
+t/public/js/ctrl.js
+t/public/js/ctrl/user.js
 t/public/js/react-complex.js
 t/public/js/react-progressbar.js
 t/public/js/react-simple.js
 t/public/js/robot.js
 t/public/packed/.browserify/react-development.js
-t/public/packed/app-complex-1b2f53907cc1e93b032868d2015b0418.js
-t/public/packed/foo.html
+t/public/packed/ctrl-76508bd3cec7d83e7523ed054c7f8d71.js
 t/react.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

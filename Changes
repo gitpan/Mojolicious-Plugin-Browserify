@@ -1,5 +1,9 @@
 Changelog for Mojolicious::Plugin::Browserify
 
+0.05     Sun Dec 21 01:48:29 2014
+       * Fix relative modules in parent directory
+       * Fix calculating checksum
+
 0.04     Wed Nov 26 09:07:16 2014
        * Add "mojo browserify bundle" command
        * Will skip t/cmd.t on $^O =~ /win/

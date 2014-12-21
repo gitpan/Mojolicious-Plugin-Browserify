@@ -10,7 +10,8 @@ plan skip_all => 'browserify was not found' if $p->executable eq 'browserify';
   cleanup();
   use Mojolicious::Lite;
   plugin "Browserify" => {environment => "development", extensions => [qw( js jsx )]};
-  app->asset("app.js" => "/js/boop.js");
+  app->asset("app.js"    => "/js/boop.js");
+  app->asset("parent.js" => "/js/ctrl.js");
 
   get "/app" => "app_js_inlined";
 }
@@ -32,3 +33,4 @@ sub cleanup {
 __DATA__
 @@ app_js_inlined.js.ep
 %= asset "app.js" => {inline => 1}
+%= asset "parent.js" => {inline => 1}

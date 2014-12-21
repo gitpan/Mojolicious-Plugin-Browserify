@@ -108,7 +108,7 @@ sub checksum {
 
   $self->_node_module_path;
   $self->_find_node_modules($text, $path, $map);
-  Mojo::Util::md5_sum($$text, join '', map { Mojo::Util::slurp($_) } values %$map);
+  Mojo::Util::md5_sum($$text, join '', map { Mojo::Util::slurp($map->{$_}) } sort keys %$map);
 }
 
 =head2 process
@@ -131,21 +131,27 @@ sub process {
   $self->_find_node_modules($text, $path, $map);
   $self->{node_modules} = $map;
 
-  for my $module (grep {/^\w/} keys %$map) {
+  # make external bundles from node_modules
+  for my $module (grep {/^\w/} sort keys %$map) {
+    my @external = map { -x => $_ } grep { $_ ne $module } keys %$map;
     push @modules, $self->_outfile($assetpack, "$module-$environment.js");
     next if -e $modules[-1] and (stat _)[9] >= (stat $map->{$module})[9];
     make_path(dirname $modules[-1]);
-    $self->_run([$self->executable, @extra, -r => $module, -o => $modules[-1]], undef, undef, \$err);
+    $self->_run([$self->executable, @extra, @external, -r => $module, -o => $modules[-1]], undef, undef, \$err);
   }
 
   if (!length $err) {
-    push @extra, map { -u => $_ } grep {/^\w/} keys %$map;
+
+    # make application bundle which reference external bundles
+    push @extra, map { -x => $_ } grep {/^\w/} sort keys %$map;
     $self->_run([$self->executable, @extra, -e => $path], undef, $text, \$err);
   }
   if (length $err) {
     $self->_make_js_error($err, $text);
   }
   elsif (length $$text) {
+
+    # bundle application and external bundles
     $$text = join "\n", (map { Mojo::Util::slurp($_) } @modules), $$text;
     $self->_minify($text, $path) if $assetpack->minify;
   }
@@ -182,9 +188,14 @@ sub _find_node_modules {
 
 sub _follow_relative_node_module {
   my ($self, $module, $path, $uniq) = @_;
+  my $base = $module;
+
+  unless (File::Spec->file_name_is_absolute($base)) {
+    $base = File::Spec->catfile(dirname($path), $module);
+  }
 
   for my $ext ("", map {".$_"} @{$self->extensions}) {
-    my $file = File::Spec->catfile(split '/', "$module$ext");
+    my $file = File::Spec->catfile(split '/', "$base$ext");
     return if $uniq->{"$module$ext"};
     next unless -f $file;
     $uniq->{"$module$ext"} = $file;

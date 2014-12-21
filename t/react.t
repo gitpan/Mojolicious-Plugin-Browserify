@@ -1,15 +1,18 @@
-BEGIN { $ENV{MOJO_MODE} //= 'production' }
+BEGIN { $ENV{MOJO_MODE} //= 'development' }
 use Mojo::Base -strict;
 use Test::Mojo;
 use Test::More;
+use Mojolicious::Plugin::Browserify::Processor;
 
-plan skip_all => 'TEST_REACT=1' unless $ENV{TEST_REACT};
+my $p = Mojolicious::Plugin::Browserify::Processor->new;
+plan skip_all => 'browserify was not found' if $p->executable eq 'browserify';
+plan skip_all => 'npm install react'    unless -d 'node_modules/react';
+plan skip_all => 'npm install reactify' unless -d 'node_modules/reactify';
 
 {
   cleanup();
   use Mojolicious::Lite;
-  plugin "Browserify" =>
-    {browserify_args => [-t => 'reactify'], environment => "development", extensions => [qw( js jsx )]};
+  plugin "Browserify" => {browserify_args => [-t => 'reactify'], extensions => [qw( js jsx )]};
   app->asset("app-complex.js" => "/js/react-complex.js");
 
   get "/app" => "app_js_inlined";
@@ -17,10 +20,10 @@ plan skip_all => 'TEST_REACT=1' unless $ENV{TEST_REACT};
 
 my $t = Test::Mojo->new;
 
-$t->get_ok('/app.js')->status_is(200)->content_like(qr{require})->content_like(qr{createClass})
-  ->content_like(qr{progressbar-container}, 'react-progressbar.js')->header_is('Content-Length' => 159054);
+$t->get_ok('/app.js')->status_is(200)->content_like(qr{fb\.me/react-devtools})->content_like(qr{createClass})
+  ->content_like(qr{progressbar-container}, 'react-progressbar.js');
 
-#cleanup();
+cleanup();
 done_testing;
 
 sub cleanup {
