@@ -23,6 +23,8 @@ t/public/js/react-simple.js
 t/public/js/robot.js
 t/public/packed/.browserify/react-development.js
 t/public/packed/ctrl-76508bd3cec7d83e7523ed054c7f8d71.js
+t/public/packed/ctrl-bceed4a6f3ed8172ec3d2432569077ef.js
+t/public/packed/ctrl-d5e3bf19eb3747bfc6c6a7aa9184b397.js
 t/react.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

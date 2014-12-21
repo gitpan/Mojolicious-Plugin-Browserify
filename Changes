@@ -1,5 +1,8 @@
 Changelog for Mojolicious::Plugin::Browserify
 
+0.06     Sun Dec 21 11:20:16 2014
+       * Fix parsing fn(require('../robot'), 'foo') statements
+
 0.05     Sun Dec 21 01:48:29 2014
        * Fix relative modules in parent directory
        * Fix calculating checksum

@@ -3,7 +3,7 @@ NAME
     assetpack+browserify
 
 VERSION
-    0.05
+    0.06
 
 DESCRIPTION
     Mojolicious::Plugin::Browserify is a plugin that will register

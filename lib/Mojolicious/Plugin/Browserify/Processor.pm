@@ -174,7 +174,7 @@ sub _executable {
 sub _find_node_modules {
   my ($self, $text, $path, $uniq) = @_;
 
-  while ($$text =~ m!\brequire\s*\(\s*(["'])(.+)+\1\s*\)\s*!g) {
+  while ($$text =~ m!\brequire\s*\(\s*(["'])(.+?)\1\s*\)\s*!g) {
     my $module = $2;
     warn "[Browserify] require($module) from $path\n" if DEBUG;
     next if $uniq->{$module};

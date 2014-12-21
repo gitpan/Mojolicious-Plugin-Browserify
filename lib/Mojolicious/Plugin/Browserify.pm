@@ -6,7 +6,7 @@ Mojolicious::Plugin::Browserify - An Mojolicious plugin for assetpack+browserify
 
 =head1 VERSION
 
-0.05
+0.06
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ this command:
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::Browserify::Processor;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 METHODS
 
